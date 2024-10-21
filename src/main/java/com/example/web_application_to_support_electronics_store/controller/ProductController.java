@@ -1,6 +1,6 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
-import com.example.web_application_to_support_electronics_store.model.Product;
+import com.example.web_application_to_support_electronics_store.config.model.Product;
 import com.example.web_application_to_support_electronics_store.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

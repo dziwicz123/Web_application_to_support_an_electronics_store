@@ -1,8 +1,7 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
-import com.example.web_application_to_support_electronics_store.model.Basket;
-import com.example.web_application_to_support_electronics_store.model.Product;
-import com.example.web_application_to_support_electronics_store.model.User;
+import com.example.web_application_to_support_electronics_store.config.model.Basket;
+import com.example.web_application_to_support_electronics_store.config.model.User;
 import com.example.web_application_to_support_electronics_store.repo.BasketRepository;
 import com.example.web_application_to_support_electronics_store.repo.ProductRepository;
 import com.example.web_application_to_support_electronics_store.repo.UserRepository;
@@ -11,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController

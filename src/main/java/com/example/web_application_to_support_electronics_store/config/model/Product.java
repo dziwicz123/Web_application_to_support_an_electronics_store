@@ -1,4 +1,4 @@
-package com.example.web_application_to_support_electronics_store.model;
+package com.example.web_application_to_support_electronics_store.config.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

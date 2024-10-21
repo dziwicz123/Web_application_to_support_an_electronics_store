@@ -1,6 +1,6 @@
 package com.example.web_application_to_support_electronics_store.service;
 
-import com.example.web_application_to_support_electronics_store.model.Category;
+import com.example.web_application_to_support_electronics_store.config.model.Category;
 import com.example.web_application_to_support_electronics_store.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

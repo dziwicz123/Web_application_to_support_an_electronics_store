@@ -1,8 +1,8 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
 import com.example.web_application_to_support_electronics_store.DTO.CategoryProductsDTO;
-import com.example.web_application_to_support_electronics_store.model.Category;
-import com.example.web_application_to_support_electronics_store.model.Product;
+import com.example.web_application_to_support_electronics_store.config.model.Category;
+import com.example.web_application_to_support_electronics_store.config.model.Product;
 import com.example.web_application_to_support_electronics_store.service.CategoryService;
 import com.example.web_application_to_support_electronics_store.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.web_application_to_support_electronics_store.model;
+package com.example.web_application_to_support_electronics_store.config.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -25,4 +25,9 @@ public class Comment {
     @JoinColumn(name = "product_id")
     @JsonIgnoreProperties("comments")
     private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("comments")
+    private User user;
 }

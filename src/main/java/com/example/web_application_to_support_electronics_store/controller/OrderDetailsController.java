@@ -1,7 +1,7 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
 import com.example.web_application_to_support_electronics_store.DTO.OrderDetailsRequest;
-import com.example.web_application_to_support_electronics_store.model.*;
+import com.example.web_application_to_support_electronics_store.config.model.*;
 import com.example.web_application_to_support_electronics_store.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

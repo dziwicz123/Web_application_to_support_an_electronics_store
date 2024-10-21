@@ -1,6 +1,6 @@
 package com.example.web_application_to_support_electronics_store.DTO;
 
-import com.example.web_application_to_support_electronics_store.model.Product;
+import com.example.web_application_to_support_electronics_store.config.model.Product;
 import java.util.List;
 
 public class CategoryProductsDTO {

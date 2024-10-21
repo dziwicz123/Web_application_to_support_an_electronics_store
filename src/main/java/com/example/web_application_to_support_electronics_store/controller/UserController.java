@@ -1,7 +1,7 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
-import com.example.web_application_to_support_electronics_store.model.ApiResponse;
-import com.example.web_application_to_support_electronics_store.model.User;
+import com.example.web_application_to_support_electronics_store.config.model.ApiResponse;
+import com.example.web_application_to_support_electronics_store.config.model.User;
 import com.example.web_application_to_support_electronics_store.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;

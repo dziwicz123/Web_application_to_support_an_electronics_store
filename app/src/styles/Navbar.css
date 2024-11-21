@@ -1,0 +1,35 @@
+.navbar-light .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(250, 250, 246, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.navbar-light .navbar-toggler {
+  border: 1px solid #DAC0A3; /* Lighter accent */
+}
+
+.dropdown-toggle::after {
+  color: #FEFAF6; /* Lighter text for dropdown arrow */
+}
+
+.categories-bar {
+  background-color: #102C57; /* Darker shade for category bar */
+  padding: 10px 20px;
+  text-align: center;
+  color: #FEFAF6; /* Light text color */
+  transition: transform 0.5s ease;
+}
+
+.slide-down {
+  transform: translateY(0%);
+}
+
+.slide-up {
+  transform: translateY(-100%);
+}
+
+.visibleOnScroll {
+  display: inline-block !important;
+}
+
+.hiddenOnScroll {
+  display: none !important;
+}

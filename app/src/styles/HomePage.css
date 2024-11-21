@@ -1,0 +1,15 @@
+.content {
+  width: 80%; /* Szerokość głównego kontenera, można dostosować */
+  margin: auto; /* Wyśrodkowanie kontenera */
+  background-color: #EADBC8;
+  padding: 20px; /* Padding dla zawartości, dodaje przestrzeń wewnątrz */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Delikatne cieniowanie wokół kontenera */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.home-page {
+  margin-bottom: 20px; /* Dodaje margines na dole sekcji */
+}

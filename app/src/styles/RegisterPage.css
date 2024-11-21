@@ -1,0 +1,26 @@
+body {
+    /* Background with gradient using the new color palette */
+    background: #DAC0A3;
+
+  }
+  .mdb-input {
+    width: 95%; /* or any other percentage or fixed width you prefer */
+    margin: auto; /* centers the input box if it's not full-width */
+  }
+  .label-fade {
+      transition: opacity 0.5s ease-out;
+     opacity: 0;
+  }
+
+.label-visible {
+    color: #102C57;
+    opacity: 1;
+}
+
+.text-danger {
+    color: #0F044C;
+}
+
+h2, p {
+    color: #102C57;
+}

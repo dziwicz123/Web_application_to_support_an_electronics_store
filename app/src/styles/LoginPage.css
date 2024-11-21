@@ -1,0 +1,49 @@
+body {
+  /* Background with gradient using the new color palette */
+  background: #DAC0A3;
+
+}
+
+.btn-login {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  color: #FEFAF6; /* Lighter text */
+  background-color: #102C57; /* Darker contrast for button background */
+  border: none;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #0F044C; /* Slightly darker shade for hover */
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.mdb-input {
+  width: 95%;
+  margin: auto;
+}
+
+.label-fade {
+  transition: opacity 0.5s ease-out;
+  opacity: 0;
+}
+
+.label-visible {
+  color: #102C57;
+  opacity: 1;
+}
+
+.text-danger {
+  color: #0F044C;
+}
+
+h2, p {
+  color: #102C57;
+}

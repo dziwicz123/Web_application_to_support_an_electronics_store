@@ -58,7 +58,24 @@ const DeliveryForm = () => {
 
     if (Object.values(newErrors).every((x) => x === '')) {
       try {
-        const basketId = sessionStorage.getItem('basketId'); // Poprawione odwołanie do basketId
+        let basketId = sessionStorage.getItem('basketId'); // Check for existing basketId
+
+        if (!basketId) {
+          // Create a new basket if not present
+          const user = JSON.parse(sessionStorage.getItem('user'));
+          if (user && user.id) {
+            const newBasketResponse = await axios.post(
+                'http://localhost:8081/api/basket/add',
+                { userId: user.id },
+                { withCredentials: true }
+            );
+            basketId = newBasketResponse.data.id;
+            sessionStorage.setItem('basketId', basketId); // Store new basketId
+          } else {
+            throw new Error('User is not logged in or missing data');
+          }
+        }
+
         const cart = JSON.parse(sessionStorage.getItem('cart'));
         const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -83,6 +100,17 @@ const DeliveryForm = () => {
 
           sessionStorage.removeItem('cart');
           sessionStorage.removeItem('basketId'); // Usuwanie używanego basketId
+
+          // Fetch the new basket for the user from the database
+          const newBasketResponse = await axios.get(`http://localhost:8081/api/basket/user/${user.id}`, { withCredentials: true });
+
+          if (newBasketResponse.data) {
+            const newBasketId = newBasketResponse.data.id; // Extract the basket ID
+            sessionStorage.setItem('basketId', newBasketId); // Store only the basket ID
+          } else {
+            console.error('No new basket found for the user');
+          }
+
 
           const stripe = await stripePromise;
           const stripeResponse = await axios.post(

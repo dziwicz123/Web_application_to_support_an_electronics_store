@@ -33,26 +33,7 @@ const ProductPage = () => {
 
   const user = JSON.parse(sessionStorage.getItem("user"));
 
-  useEffect(() => {
-    if (productId) {
-      const fetchProduct = async () => {
-        try {
-          const productResponse = await axios.get(
-              `http://localhost:8081/api/products/${productId}/dto`
-          );
-          setProduct(productResponse.data);
-          fetchUserComment(); // Pobieranie komentarza użytkownika
-          fetchComments(); // Pobieranie innych komentarzy
-        } catch (error) {
-          console.error("Error fetching product:", error);
-        }
-      };
 
-      fetchProduct();
-    } else {
-      console.error("Product ID is undefined");
-    }
-  }, [productId]);
 
   const fetchUserComment = async () => {
     try {
@@ -83,6 +64,27 @@ const ProductPage = () => {
       console.error("Error fetching comments:", error);
     }
   };
+
+  const fetchProduct = async () => {
+    try {
+      const productResponse = await axios.get(
+          `http://localhost:8081/api/products/${productId}/dto`
+      );
+      setProduct(productResponse.data);
+    } catch (error) {
+      console.error("Error fetching product:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (productId) {
+      fetchUserComment(); // Pobieranie komentarza użytkownika
+      fetchComments();
+      fetchProduct();
+    } else {
+      console.error("Product ID is undefined");
+    }
+  }, [productId]);
 
   const handleChange = (event) => {
     setQuantity(event.target.value);
@@ -253,14 +255,14 @@ const ProductPage = () => {
               {/* Wyświetlanie sekcji opinii tylko, gdy użytkownik jest zalogowany */}
               {user ? (
                   <>
-                    {/* Conditional Rendering: Opinion or OpinionEdit */}
                     {userComment ? (
                         <OpinionEdit
                             existingOpinion={userComment}
                             productId={productId}
                             onOpinionUpdated={() => {
                               fetchUserComment();
-                              fetchComments(); // Optionally refetch comments to reflect updates
+                              fetchComments();
+                              fetchProduct();
                             }}
                         />
                     ) : (
@@ -268,7 +270,8 @@ const ProductPage = () => {
                             productId={productId}
                             onOpinionAdded={() => {
                               fetchUserComment();
-                              fetchComments(); // Optionally refetch comments to reflect new opinion
+                              fetchComments();
+                              fetchProduct();
                             }}
                         />
                     )}

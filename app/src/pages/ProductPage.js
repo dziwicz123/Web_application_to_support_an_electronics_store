@@ -78,12 +78,7 @@ const ProductPage = () => {
           `http://localhost:8081/api/comments/product/${productId}`
       );
       const allProductComments = productCommentsResponse.data;
-
-      // Filtracja komentarzy tak, aby nie zawierały komentarza użytkownika
-      const otherComments = allProductComments.filter(
-          (comment) => comment.username !== user.username
-      );
-      setComments(otherComments);
+      setComments(allProductComments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -255,26 +250,33 @@ const ProductPage = () => {
             </Grid>
 
             <Grid item xs={12} sx={{ mt: 4 }}>
-
-
-              {/* Conditional Rendering: Opinion or OpinionEdit */}
-              {userComment ? (
-                  <OpinionEdit
-                      existingOpinion={userComment}
-                      productId={productId}
-                      onOpinionUpdated={() => {
-                        fetchUserComment();
-                        fetchComments(); // Optionally refetch comments to reflect updates
-                      }}
-                  />
+              {/* Wyświetlanie sekcji opinii tylko, gdy użytkownik jest zalogowany */}
+              {user ? (
+                  <>
+                    {/* Conditional Rendering: Opinion or OpinionEdit */}
+                    {userComment ? (
+                        <OpinionEdit
+                            existingOpinion={userComment}
+                            productId={productId}
+                            onOpinionUpdated={() => {
+                              fetchUserComment();
+                              fetchComments(); // Optionally refetch comments to reflect updates
+                            }}
+                        />
+                    ) : (
+                        <Opinion
+                            productId={productId}
+                            onOpinionAdded={() => {
+                              fetchUserComment();
+                              fetchComments(); // Optionally refetch comments to reflect new opinion
+                            }}
+                        />
+                    )}
+                  </>
               ) : (
-                  <Opinion
-                      productId={productId}
-                      onOpinionAdded={() => {
-                        fetchUserComment();
-                        fetchComments(); // Optionally refetch comments to reflect new opinion
-                      }}
-                  />
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    Zaloguj się, aby dodać swoją opinię o tym produkcie.
+                  </Typography>
               )}
 
               <Typography variant="h5" gutterBottom>

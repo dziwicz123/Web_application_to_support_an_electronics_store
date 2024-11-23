@@ -75,4 +75,9 @@ public class ProductService {
 
         return sum / product.getComments().size(); // Calculate average
     }
+
+    public Long getMaxProductId() {
+        return productRepository.findMaxId().orElse(0L);
+    }
+
 }

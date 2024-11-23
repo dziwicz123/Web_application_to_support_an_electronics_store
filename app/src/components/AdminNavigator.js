@@ -26,9 +26,6 @@ const item = {
   py: '2px',
   px: 3,
   color: '#102C57', // Dark blue text color for items
-  '&:hover, &:focus': {
-    bgcolor: '#DAC0A3', // Lighter tan color on hover
-  },
 };
 
 const itemCategory = {

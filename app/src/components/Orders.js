@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import {
+    Container,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Select,
+    MenuItem,
+    TableSortLabel,
+    Pagination,
+    Stack,
+    Typography,
+} from '@mui/material';
 import axios from 'axios';
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, TableSortLabel } from '@mui/material';
 
 function Orders() {
     const [orders, setOrders] = useState([]);
     const [editingStatus, setEditingStatus] = useState({});
     const [sortOrder, setSortOrder] = useState('asc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const ordersPerPage = 10;
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -62,6 +79,16 @@ function Orders() {
         handleStatusChange(id, newState);
     };
 
+    // Pagination calculations
+    const indexOfLastOrder = currentPage * ordersPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+    const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
+
     return (
         <Container>
             <Typography variant="h4" gutterBottom>
@@ -88,8 +115,16 @@ function Orders() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {orders.map((order) => (
-                            <TableRow key={order.id}>
+                        {currentOrders.map((order, index) => (
+                            <TableRow
+                                key={order.id}
+                                sx={{
+                                    backgroundColor: index % 2 === 0 ? '#FEFAF6' : '#EADBC8',
+                                    '&:hover': {
+                                        backgroundColor: '#D1C4E9',
+                                    },
+                                }}
+                            >
                                 <TableCell>{order.basket.id}</TableCell>
                                 <TableCell>{order.basket.totalPrice}</TableCell>
                                 <TableCell>{order.orderDate}</TableCell>
@@ -112,6 +147,11 @@ function Orders() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Pagination */}
+            <Stack spacing={2} sx={{ mt: 2 }} alignItems="center">
+                <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
+            </Stack>
         </Container>
     );
 }

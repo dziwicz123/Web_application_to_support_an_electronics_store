@@ -58,139 +58,149 @@ function AddUser() {
   const inputStyle = {
     backgroundColor: '#FEFAF6',
     borderRadius: '12px', // Adjust this value to match the border radius of the Card
-    overflow: 'hidden', // Prevent content from exceeding rounded borders
+
   };
 
-  return (
-      <Container className="login-container" maxWidth="sm">
-        <Card
+    return (
+        <Container
+            maxWidth="lg"
             style={{
-              backgroundColor: '#EADBC8',
-              borderRadius: '12px', // Match with TextField styles
-              maxWidth: '500px',
-              padding: '2rem',
+                marginTop: 0, // Remove extra space at the top
+                padding: '1rem', // Add padding for spacing
+                backgroundColor: 'transparent', // Match the admin panel's background
+                display: 'flex', // Flexbox for alignment
+                justifyContent: 'center', // Center horizontally
             }}
         >
-          <Typography
-              variant="h4"
-              gutterBottom
-              style={{ textAlign: 'center', color: '#102C57' }}
-          >
-            Dodaj użytkownika
-          </Typography>
-          {error && <Alert severity="error">{error}</Alert>}
-          {success && <Alert severity="success">{success}</Alert>}
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                    label="Imię"
-                    fullWidth
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    InputLabelProps={{
-                      style: { color: '#102C57' },
-                    }}
-                    InputProps={{
-                      style: inputStyle,
-                    }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                    label="Nazwisko"
-                    fullWidth
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    InputLabelProps={{
-                      style: { color: '#102C57' },
-                    }}
-                    InputProps={{
-                      style: inputStyle,
-                    }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                    label="Email"
-                    fullWidth
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    InputLabelProps={{
-                      style: { color: '#102C57' },
-                    }}
-                    InputProps={{
-                      style: inputStyle,
-                    }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                    label="Numer telefonu"
-                    fullWidth
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    InputLabelProps={{
-                      style: { color: '#102C57' },
-                    }}
-                    InputProps={{
-                      style: inputStyle,
-                    }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                    label="Hasło"
-                    fullWidth
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    InputLabelProps={{
-                      style: { color: '#102C57' },
-                    }}
-                    InputProps={{
-                      style: inputStyle,
-                    }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                    label="Potwierdź hasło"
-                    fullWidth
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    InputLabelProps={{
-                      style: { color: '#102C57' },
-                    }}
-                    InputProps={{
-                      style: inputStyle,
-                    }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                    variant="contained"
-                    type="submit"
-                    fullWidth
-                    style={{
-                      backgroundColor: '#102C57',
-                      color: '#FEFAF6',
-                      borderRadius: '12px', // Same as other components
-                      fontSize: '1rem',
-                      height: '3rem',
-                    }}
+            <Card
+                style={{
+                    backgroundColor: '#EADBC8',
+                    borderRadius: '12px', // Match with TextField styles
+                    maxWidth: '500px',
+                    padding: '2rem',
+                    boxShadow: 'none', // Keep it minimalistic
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    gutterBottom
+                    style={{ textAlign: 'center', color: '#102C57' }}
                 >
-                  Dodaj użytkownika
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Card>
-      </Container>
-  );
+                    Dodaj użytkownika
+                </Typography>
+                {error && <Alert severity="error">{error}</Alert>}
+                {success && <Alert severity="success">{success}</Alert>}
+                <form onSubmit={handleSubmit}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Imię"
+                                fullWidth
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                InputLabelProps={{
+                                    style: { color: '#102C57' },
+                                }}
+                                InputProps={{
+                                    style: inputStyle,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Nazwisko"
+                                fullWidth
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                InputLabelProps={{
+                                    style: { color: '#102C57' },
+                                }}
+                                InputProps={{
+                                    style: inputStyle,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Email"
+                                fullWidth
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                InputLabelProps={{
+                                    style: { color: '#102C57' },
+                                }}
+                                InputProps={{
+                                    style: inputStyle,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Numer telefonu"
+                                fullWidth
+                                type="tel"
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                                InputLabelProps={{
+                                    style: { color: '#102C57' },
+                                }}
+                                InputProps={{
+                                    style: inputStyle,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Hasło"
+                                fullWidth
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                InputLabelProps={{
+                                    style: { color: '#102C57' },
+                                }}
+                                InputProps={{
+                                    style: inputStyle,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Potwierdź hasło"
+                                fullWidth
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                InputLabelProps={{
+                                    style: { color: '#102C57' },
+                                }}
+                                InputProps={{
+                                    style: inputStyle,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button
+                                variant="contained"
+                                type="submit"
+                                fullWidth
+                                style={{
+                                    backgroundColor: '#102C57',
+                                    color: '#FEFAF6',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    height: '3rem',
+                                }}
+                            >
+                                Dodaj użytkownika
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </form>
+            </Card>
+        </Container>
+    );
 }
 
 export default AddUser;

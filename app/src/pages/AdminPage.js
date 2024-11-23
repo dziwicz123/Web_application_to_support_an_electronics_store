@@ -1,4 +1,3 @@
-// AdminPage.js
 import React, { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';

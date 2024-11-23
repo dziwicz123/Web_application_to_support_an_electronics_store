@@ -1,7 +1,9 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
+import com.example.web_application_to_support_electronics_store.DTO.AddProductDTO;
 import com.example.web_application_to_support_electronics_store.DTO.ProductDTO;
 import com.example.web_application_to_support_electronics_store.config.model.Product;
+import com.example.web_application_to_support_electronics_store.service.CategoryService;
 import com.example.web_application_to_support_electronics_store.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping("/search")
     public List<Product> searchProducts(@RequestParam String query) {
@@ -34,10 +39,31 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        Product savedProduct = productService.addProduct(product);
-        return ResponseEntity.ok(savedProduct);
+    public ResponseEntity<?> addProduct(@RequestBody AddProductDTO productDTO) {
+        if (!productDTO.isValid()) {
+            return ResponseEntity.badRequest().body("All fields are required and price must be greater than 0.");
+        }
+
+        try {
+            // Create the Product object without explicitly setting the ID
+            Product product = Product.builder()
+                    .productName(productDTO.getProductName())
+                    .description(productDTO.getDescription())
+                    .image(productDTO.getImage())
+                    .price(productDTO.getPrice())
+                    .category(categoryService.getCategoryById(productDTO.getCategoryId()))
+                    .build();
+
+            // Save product; the database auto-generates the ID
+            Product savedProduct = productService.addProduct(product);
+
+            return ResponseEntity.ok(savedProduct);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to add product: " + e.getMessage());
+        }
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {

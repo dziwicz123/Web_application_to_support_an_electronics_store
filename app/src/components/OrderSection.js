@@ -63,7 +63,7 @@ const OrderSection = () => {
         <Box mb={4} style={{ color: '#000' }}>
             <Typography variant="h6" style={{ color: '#000' }}>Zamówienia</Typography>
             {userOrders.map((order) => (
-                <Paper key={order.id} elevation={3} style={{ padding: '16px', marginTop: '16px', backgroundColor: '#fff' }}>
+                <Paper key={order.id} elevation={3} style={{ padding: '16px', marginTop: '16px'}}>
                     <Typography variant="body1"><strong>{order.state === 'DELIVERED' ? 'Zakończone' : 'W toku'}</strong></Typography>
                     <Typography variant="body2" style={{ color: '#888888' }}>{new Date(order.orderDate).toLocaleDateString()}</Typography>
                     <Typography variant="body2" style={{ color: '#888888' }}>nr {order.id}</Typography>

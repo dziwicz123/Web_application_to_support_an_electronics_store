@@ -30,6 +30,22 @@ class WebApplicationToSupportElectronicsStoreApplicationApplicationTests {
 		Faker faker = new Faker(new Locale("pl"));
 		Random random = new Random();
 
+		// Tworzenie 100 użytkowników
+		List<User> users = new ArrayList<>();
+		for (int i = 0; i < 100; i++) {
+			User user = User.builder()
+					.name(faker.name().firstName())
+					.lastName(faker.name().lastName())
+					.email(faker.internet().emailAddress())
+					.phone(faker.number().numberBetween(100000000, 999999999))
+					.password(faker.internet().password())
+					.userType(UserType.USER)
+					.build();
+
+			user = userRepository.save(user);
+			users.add(user);
+		}
+
 		// Dodanie 20 sklepów w Polsce
 		List<Shop> shops = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
@@ -50,22 +66,6 @@ class WebApplicationToSupportElectronicsStoreApplicationApplicationTests {
 
 		Map<Long, Product> productMap = products.stream()
 				.collect(Collectors.toMap(Product::getId, product -> product));
-
-		// Tworzenie 100 użytkowników
-		List<User> users = new ArrayList<>();
-		for (int i = 0; i < 100; i++) {
-			User user = User.builder()
-					.name(faker.name().firstName())
-					.lastName(faker.name().lastName())
-					.email(faker.internet().emailAddress())
-					.phone(faker.number().numberBetween(100000000, 999999999))
-					.password(faker.internet().password())
-					.userType(UserType.USER)
-					.build();
-
-			user = userRepository.save(user);
-			users.add(user);
-		}
 
 		// Mapowanie produktów do odpowiednich dystrybucji ocen
 		Map<Long, double[]> productRatingDistributions = new HashMap<>();

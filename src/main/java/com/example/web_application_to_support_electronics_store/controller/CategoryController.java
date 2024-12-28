@@ -51,7 +51,8 @@ public class CategoryController {
                             product.getCutPrice(),
                             product.getComments() != null ? product.getComments().size() : 0,
                             category.getCategoryName(),
-                            product.getDescription()
+                            product.getDescription(),
+                            product.getQuantityType()
                     ))
                     .toList();
 

@@ -5,7 +5,6 @@ import {
   Typography,
   Card,
   CardMedia,
-  Grid,
   Container,
   Paper,
   FormControl,
@@ -13,58 +12,31 @@ import {
   Select,
   Rating,
 } from "@mui/material";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+
 import AppNavbar from "../components/Navbar";
 import AppFooter from "../components/Footer";
-import axios from "axios";
-import { useParams } from "react-router-dom";
 import AddToCartModal from "../components/AddToCartModal";
 import Opinion from "../components/Opinion";
 import OpinionEdit from "../components/OpinionEdit";
 
 const ProductPage = () => {
+  // Pobieramy ID produktu z parametrów adresu URL
   const { productId } = useParams();
+
+  // Stany potrzebne do obsługi produktu, koszyka oraz komentarzy
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [openModal, setOpenModal] = useState(false);
   const [comments, setComments] = useState([]);
   const [userComment, setUserComment] = useState(null);
 
+  // Informacje o zalogowanym użytkowniku (zakładamy, że przechowujemy je w sessionStorage)
   const user = JSON.parse(sessionStorage.getItem("user"));
 
-
-
-  const fetchUserComment = async () => {
-    try {
-      // Pobieranie wszystkich komentarzy użytkownika na podstawie e-maila
-      const userCommentsResponse = await axios.get(
-          `http://localhost:8081/api/comments/user/${user.email}`
-      );
-      const userComments = userCommentsResponse.data;
-
-      // Sprawdzenie, czy użytkownik ma już komentarz do danego produktu
-      const userProductComment = userComments.find(
-          (comment) => comment.productId === parseInt(productId)
-      );
-      setUserComment(userProductComment);
-    } catch (error) {
-      console.error("Error fetching user comment:", error);
-    }
-  };
-
-  const fetchComments = async () => {
-    try {
-      const productCommentsResponse = await axios.get(
-          `http://localhost:8081/api/comments/product/${productId}`
-      );
-      const allProductComments = productCommentsResponse.data;
-      setComments(allProductComments);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
-
+  // Funkcja do pobierania informacji o jednym produkcie z API
   const fetchProduct = async () => {
     try {
       const productResponse = await axios.get(
@@ -76,51 +48,90 @@ const ProductPage = () => {
     }
   };
 
+  // Funkcja do pobierania wszystkich komentarzy (opinii) dotyczących danego produktu
+  const fetchComments = async () => {
+    try {
+      const productCommentsResponse = await axios.get(
+          `http://localhost:8081/api/comments/product/${productId}`
+      );
+      setComments(productCommentsResponse.data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  // Funkcja do pobierania opinii zalogowanego użytkownika dla danego produktu
+  const fetchUserComment = async () => {
+    if (!user?.email) return; // Jeśli nie ma użytkownika lub brak email, nie pobieramy komentarza
+    try {
+      // Najpierw pobierz wszystkie komentarze użytkownika na podstawie e-maila
+      const userCommentsResponse = await axios.get(
+          `http://localhost:8081/api/comments/user/${user.email}`
+      );
+      const userComments = userCommentsResponse.data;
+
+      // Sprawdź, czy użytkownik ma już komentarz dla tego konkretnego produktu
+      const userProductComment = userComments.find(
+          (comment) => comment.productId === parseInt(productId)
+      );
+      setUserComment(userProductComment);
+    } catch (error) {
+      console.error("Error fetching user comment:", error);
+    }
+  };
+
+  // useEffect — wywołujemy nasze funkcje (fetchProduct, fetchComments, fetchUserComment) po załadowaniu komponentu
   useEffect(() => {
     if (productId) {
-      fetchUserComment(); // Pobieranie komentarza użytkownika
-      fetchComments();
       fetchProduct();
+      fetchComments();
+      fetchUserComment();
     } else {
       console.error("Product ID is undefined");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
+  // Obsługa zmiany ilości w select'cie
   const handleChange = (event) => {
     setQuantity(event.target.value);
   };
 
+  // Obsługa dodania do koszyka
   const handleAddToCart = () => {
     const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-    const cartProduct = {
-      ...product,
-      quantity: quantity,
-    };
-
+    // Dodajemy lub aktualizujemy produkt w koszyku
     const existingProductIndex = cart.findIndex((item) => item.id === product.id);
-
     if (existingProductIndex !== -1) {
+      // Jeśli produkt już istnieje w koszyku, zwiększamy ilość
       cart[existingProductIndex].quantity += quantity;
     } else {
-      cart.push(cartProduct);
+      // W przeciwnym razie dodajemy nowy produkt
+      cart.push({ ...product, quantity });
     }
 
+    // Zapisujemy koszyk w sessionStorage
     sessionStorage.setItem("cart", JSON.stringify(cart));
+    // Otwieramy modal potwierdzający dodanie do koszyka
     setOpenModal(true);
   };
 
+  // Zamknięcie modala po dodaniu do koszyka
   const handleCloseModal = () => {
     setOpenModal(false);
   };
 
+  // Jeśli produkt jeszcze się ładuje, wyświetlamy tymczasowy komunikat
   if (!product) {
     return <Typography>Loading...</Typography>;
   }
 
-  const formattedDescription = product.description.replace(/\\r\\n|\\n/g, "\n");
-  const descriptionLines = formattedDescription.split("\n");
+  // Formatowanie opisu produktu (zamiana \n na nowe linie itd.)
+  const formattedDescription = product.description?.replace(/\\r\\n|\\n/g, "\n");
+  const descriptionLines = formattedDescription?.split("\n") || [];
 
+  // Pomocnicza funkcja do wyróżniania nazwy parametru w opisie
   const formatLine = (line) => {
     const parts = line.split(":");
     if (parts.length > 1) {
@@ -136,170 +147,265 @@ const ProductPage = () => {
   return (
       <>
         <AppNavbar />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Container
-              maxWidth="lg"
+
+        <Container
+            maxWidth="lg"
+            sx={{
+              py: 4,
+              backgroundColor: "#f8f4ee",
+              marginTop: 5,
+              marginBottom: 5,
+              borderRadius: 6,
+            }}
+        >
+          {/* Nazwa produktu */}
+          <Typography
+              variant="h4"
+              gutterBottom
+              component="div"
+              sx={{ mt: 2, mb: 2, textAlign: "center" }}
+          >
+            {product.productName}
+          </Typography>
+
+          {/* Sekcja główna: obrazek + prawa kolumna z ceną i przyciskami */}
+          <Box
               sx={{
-                py: 3,
-                marginTop: 3,
-                marginBottom: 3,
-                borderRadius: 7,
-                backgroundColor: "#f8f4ee",
-                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "flex-start",
               }}
           >
-            <Grid container spacing={4} alignItems="flex-start">
-              <Grid item xs={12}>
-                <Typography
-                    variant="h4"
-                    gutterBottom
-                    component="div"
-                    sx={{ mt: 2, mb: 2, textAlign: "center" }}
-                >
-                  {product.productName}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card elevation={0}>
-                  <CardMedia
-                      component="img"
-                      image={product.image}
-                      alt={product.productName}
-                      sx={{ width: "100%", height: "auto" }}
-                  />
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Paper elevation={2} sx={{ p: 2, height: "100%" }}>
-                      {product.cutPrice && (
-                          <Typography sx={{ color: "green", fontWeight: "bold" }} gutterBottom>
-                            Oszczędź {product.price - product.cutPrice} zł
-                          </Typography>
-                      )}
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Typography variant="h5" sx={{ fontWeight: "bold", mr: 2 }}>
-                          {product.cutPrice ? product.cutPrice : product.price} zł
-                        </Typography>
-                        <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
-                          <Rating
-                              value={product.rating || 0}
-                              precision={0.5}
-                              readOnly
-                              size="large"
-                          />
-                          <Typography variant="body2" sx={{ ml: 1, color: "gray" }}>
-                            ({product.reviewCount || 0})
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
-                        <FormControl size="small" sx={{ width: "70px", mr: 1 }}>
-                          <Select
-                              labelId="quantity-label"
-                              id="quantity"
-                              value={quantity}
-                              onChange={handleChange}
-                          >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
-                            <MenuItem value={3}>3</MenuItem>
-                            <MenuItem value={4}>4</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            sx={{ flexGrow: 1 }}
-                            startIcon={<ShoppingCartIcon />}
-                            onClick={handleAddToCart}
-                        >
-                          Dodaj do koszyka
-                        </Button>
-                      </Box>
-                      <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
-                        <CheckCircleOutlineIcon sx={{ color: "green", mr: 1 }} />
-                        <Typography variant="body2" sx={{ color: "green" }}>
-                          Dostępny
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
+            {/* Lewa część: obrazek produktu */}
+            <Card elevation={0} sx={{ mr: 4 }}>
+              <CardMedia
+                  component="img"
+                  image={product.image}
+                  alt={product.productName}
+                  sx={{ width: "400px", height: "auto" }}
+              />
+            </Card>
 
-            <Grid item xs={12} sx={{ mt: 4 }}>
-              <Typography
-                  variant="h5"
-                  gutterBottom
-                  component="div"
-                  sx={{ mb: 1 }}
-              >
-                Opis Produktu
-              </Typography>
-              <Paper elevation={2} sx={{ p: 2 }}>
-                <Typography variant="body1">
-                  {descriptionLines.map((line, index) => (
-                      <span key={index}>
-                    {formatLine(line)}
-                        <br />
-                  </span>
-                  ))}
-                </Typography>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} sx={{ mt: 4 }}>
-              {/* Wyświetlanie sekcji opinii tylko, gdy użytkownik jest zalogowany */}
-              {user ? (
-                  <>
-                    {userComment ? (
-                        <OpinionEdit
-                            existingOpinion={userComment}
-                            productId={productId}
-                            onOpinionUpdated={() => {
-                              fetchUserComment();
-                              fetchComments();
-                              fetchProduct();
-                            }}
-                        />
-                    ) : (
-                        <Opinion
-                            productId={productId}
-                            onOpinionAdded={() => {
-                              fetchUserComment();
-                              fetchComments();
-                              fetchProduct();
-                            }}
-                        />
-                    )}
-                  </>
-              ) : (
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    Zaloguj się, aby dodać swoją opinię o tym produkcie.
+            {/* Prawa część: cena, rating, dostępność, dodawanie do koszyka */}
+            <Paper
+                elevation={2}
+                sx={{
+                  p: 5,
+                  width: "400px",
+                  height: "auto",
+                  textAlign: "right",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  borderRadius: 4,
+                  ml: 8,
+                }}
+            >
+              {/* Wyświetlenie informacji o rabacie (jeśli jest) */}
+              {product.cutPrice && (
+                  <Typography
+                      sx={{ color: "green", fontWeight: "bold", fontSize: "32px" }}
+                  >
+                    Zaoszczędź {product.price - product.cutPrice} zł
                   </Typography>
               )}
 
-              <Typography variant="h5" gutterBottom>
-                Komentarze
+              {/* Główna cena */}
+              <Typography variant="h2" sx={{ fontWeight: "bold", fontSize: "48px" }}>
+                {product.cutPrice || product.price} zł
               </Typography>
 
-              {/* Display Other Users' Comments */}
-              {comments.map((comment) => (
-                  <Paper elevation={1} sx={{ p: 2, mb: 2 }} key={comment.id}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                      {comment.username}
+              {/* Ocena (rating) + liczba recenzji */}
+              <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    ml: "auto",
+                    mt: 2,
+                  }}
+              >
+                <Rating
+                    value={product.rating || 0}
+                    precision={0.5}
+                    readOnly
+                    size="large"
+                />
+                <Typography
+                    sx={{
+                      ml: 1,
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      color: "gray",
+                    }}
+                >
+                  ({product.reviewCount || 0})
+                </Typography>
+              </Box>
+
+              {/* Status dostępności (oparty np. o pole isAvailable w bazie) */}
+                <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                    {/* Kółko z odpowiednim kolorem */}
+                    <Box
+                        sx={{
+                            width: "12px",
+                            height: "12px",
+                            borderRadius: "50%",
+                            backgroundColor:
+                                product.quantityType === "NORMAL"
+                                    ? "green"
+                                    : product.quantityType === "FEW"
+                                        ? "orange"
+                                        : "red", // Domyślnie "red" jeśli "NONE" lub brak danych
+                            mr: 1,
+                        }}
+                    />
+                    {/* Tekst wyświetlający się obok */}
+                    <Typography
+                        sx={{ color: "black", fontWeight: "bold", fontSize: "28px" }}
+                    >
+                        {product.quantityType === "NORMAL"
+                            ? "Dostępny"
+                            : product.quantityType === "FEW"
+                                ? "Ostatnie sztuki"
+                                : "Niedostępny"}
                     </Typography>
-                    <Rating value={comment.rating} precision={0.5} readOnly size="small" />
-                    <Typography variant="body2">{comment.description}</Typography>
-                  </Paper>
+                </Box>
+
+              {/* Dodawanie produktu do koszyka (select + przycisk) */}
+              <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    mt: 4,
+                    width: "100%",
+                  }}
+              >
+                <FormControl
+                    variant="outlined"
+                    size="medium"
+                    sx={{ width: "120px", mr: 3 }}
+                    disabled={product.quantityType === "NONE"}
+                >
+                    <Select
+                        value={quantity}
+                        onChange={handleChange}
+                    >
+                        {[1, 2, 3, 4].map((q) => (
+                            <MenuItem key={q} value={q}>
+                                {q}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                  <Button
+                      variant="contained"
+                      color="success"
+                      sx={{
+                          width: "200px",
+                          height: "60px",
+                          fontSize: "22px",
+                          fontWeight: "bold",
+                      }}
+                      onClick={handleAddToCart}
+                      disabled={product.quantityType === "NONE"}
+                      startIcon={<ShoppingCartIcon />}
+                  >
+                      Dodaj
+                  </Button>
+              </Box>
+            </Paper>
+          </Box>
+
+          {/* Opis produktu */}
+          <Typography variant="h5" sx={{ mt: 4 }}>
+            Opis Produktu
+          </Typography>
+          <Paper elevation={3} sx={{ p: 3, borderRadius: 4 }}>
+            <Typography variant="body1">
+              {descriptionLines.map((line, index) => (
+                  <span key={index}>
+                {formatLine(line)}
+                    <br />
+              </span>
               ))}
-            </Grid>
-          </Container>
-        </Box>
+            </Typography>
+          </Paper>
+
+          {/* Sekcja komentarzy / opinii */}
+          <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+            Komentarze
+          </Typography>
+
+          {/* Jeśli użytkownik jest zalogowany, pokaż formularz opinii (lub edycji, jeśli już dodał) */}
+          {user ? (
+              userComment ? (
+                  // Komponent do edycji opinii
+                  <OpinionEdit
+                      existingOpinion={userComment}
+                      productId={productId}
+                      onOpinionUpdated={() => {
+                        // Po aktualizacji opinii odświeżamy dane
+                        fetchUserComment();
+                        fetchComments();
+                        fetchProduct();
+                      }}
+                  />
+              ) : (
+                  // Komponent do dodania nowej opinii
+                  <Opinion
+                      productId={productId}
+                      onOpinionAdded={() => {
+                        // Po dodaniu opinii odświeżamy dane
+                        fetchUserComment();
+                        fetchComments();
+                        fetchProduct();
+                      }}
+                  />
+              )
+          ) : (
+              <Typography variant="body1" sx={{ mb: 3 }}>
+                Zaloguj się, aby dodać swoją opinię o tym produkcie.
+              </Typography>
+          )}
+
+          {/* Wyświetlanie istniejących komentarzy (pozostałych użytkowników) */}
+          {comments.map((comment) => (
+              <Paper
+                  elevation={3}
+                  sx={{
+                    p: 3,
+                    mb: 3,
+                    borderRadius: 4,
+                  }}
+                  key={comment.id}
+              >
+                <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                    {comment.username}
+                  </Typography>
+                  <Rating
+                      value={comment.rating}
+                      precision={0.5}
+                      readOnly
+                      size="medium"
+                  />
+                </Box>
+                <Typography variant="body1" sx={{ mt: 1 }}>
+                  {comment.description}
+                </Typography>
+              </Paper>
+          ))}
+        </Container>
+
         <AddToCartModal open={openModal} handleClose={handleCloseModal} />
+
         <AppFooter />
       </>
   );

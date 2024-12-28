@@ -1,5 +1,6 @@
 package com.example.web_application_to_support_electronics_store.DTO;
 
+import com.example.web_application_to_support_electronics_store.config.model.ProductQuantity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,10 +17,13 @@ public class ProductDTO {
     private Float cutPrice;
     private int reviewCount;
     private String categoryName;
-    private String description; // Add this line
+    private String description;
+    private ProductQuantity quantityType;
 
-    // Update constructors to include description
-    public ProductDTO(Long id, String productName, float rating, float price, String image, Float cutPrice, int reviewCount, String categoryName, String description) {
+    public ProductDTO(Long id, String productName, float rating, float price,
+                      String image, Float cutPrice, int reviewCount,
+                      String categoryName, String description,
+                      ProductQuantity quantityType) {
         this.id = id;
         this.productName = productName;
         this.rating = rating;
@@ -28,6 +32,7 @@ public class ProductDTO {
         this.cutPrice = cutPrice;
         this.reviewCount = reviewCount;
         this.categoryName = categoryName;
-        this.description = description; // Add this line
+        this.description = description;
+        this.quantityType = quantityType;
     }
 }

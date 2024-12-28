@@ -57,7 +57,8 @@ public class ProductService {
                             product.getCutPrice(),
                             reviewCount,
                             categoryName,
-                            product.getDescription()
+                            product.getDescription(),
+                            product.getQuantityType()
                     );
                 })
                 .collect(Collectors.toList());

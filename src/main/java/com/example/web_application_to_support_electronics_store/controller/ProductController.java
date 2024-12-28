@@ -90,7 +90,8 @@ public class ProductController {
                 product.getCutPrice(),
                 product.getComments() != null ? product.getComments().size() : 0, // Liczenie komentarzy
                 categoryName,
-                product.getDescription()
+                product.getDescription(),
+                product.getQuantityType()
         );
 
         return ResponseEntity.ok(productDTO);

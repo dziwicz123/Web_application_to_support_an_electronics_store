@@ -7,6 +7,7 @@ import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import Button from "@mui/material/Button";
 import AppNavbar from "../components/Navbar";
 import AppFooter from "../components/Footer";
+import { useAuth } from '../AuthContext';
 
 function LoginPage() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -43,9 +45,10 @@ function LoginPage() {
       const res = await response.json();
 
       if (response.ok && res.status && res.user) {
-        sessionStorage.setItem("user", JSON.stringify(res.user));
+        // Wywołaj login z kontekstu:
+        login(res.user);
 
-        // Save basket ID
+        // Zapis koszyka jeśli potrzeba:
         if (res.basketId) {
           sessionStorage.setItem("basketId", res.basketId);
         }
@@ -54,14 +57,12 @@ function LoginPage() {
         if (res.user.userType === "ADMIN") {
           navigate("/admin");
         } else {
-          const redirectTo = location.state?.from || "/"; // Redirect to the intended page or home
+          const redirectTo = location.state?.from || "/";
           navigate(redirectTo);
         }
       } else if (response.status === 403) {
-        // Handle banned account
         setErrorMessage(res.message || "Your account is banned. Please contact support.");
       } else {
-        // Handle other errors
         setErrorMessage(res.message || "Failed to log in. Please try again.");
       }
     } catch (error) {

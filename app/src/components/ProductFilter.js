@@ -10,26 +10,34 @@ import {
   Typography,
 } from '@mui/material';
 
-const ProductFilter = ({ onFilterChange, categoryId }) => {
+function ProductFilter({ onFilterChange, producers = [], categoryId }) {
   const [filters, setFilters] = useState({
-    producers: {
-      HP: false,
-      Dell: false,
-      ASUS: false,
-      Lenovo: false,
-      G4M3R: false,
-    },
+    producers: {},
     priceFrom: '',
     priceTo: '',
   });
 
   const previousFiltersRef = useRef(filters);
-
   const debouncedOnFilterChange = useCallback(debounce(onFilterChange, 300), [onFilterChange]);
 
+  // Kiedy "producers" się zmieni (np. z bazy), odbudujmy stan "producers" w filters
+  useEffect(() => {
+    const producersObj = producers.reduce((acc, producer) => {
+      if (producer) acc[producer] = false;
+      return acc;
+    }, {});
+
+    // Nadpisujemy stary stan, ale zostawiamy priceFrom i priceTo
+    setFilters(prev => ({
+      ...prev,
+      producers: producersObj,
+    }));
+  }, [producers]);
+
+  // Kolejny useEffect śledzi zmiany "filters" i wywołuje debouncedOnFilterChange
   useEffect(() => {
     const selectedProducers = Object.keys(filters.producers).filter(
-        (producer) => filters.producers[producer]
+        (producer) => filters.producers[producer] === true
     );
 
     const updatedFilters = {
@@ -43,6 +51,7 @@ const ProductFilter = ({ onFilterChange, categoryId }) => {
     }
   }, [filters, debouncedOnFilterChange]);
 
+  // Obsługa checkboxów
   const handleCheckboxChange = (event, category) => {
     const { name, checked } = event.target;
     setFilters((prevFilters) => ({
@@ -54,6 +63,7 @@ const ProductFilter = ({ onFilterChange, categoryId }) => {
     }));
   };
 
+  // Obsługa inputów (priceFrom, priceTo)
   const handleInputChange = ({ target: { name, value } }) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -85,32 +95,32 @@ const ProductFilter = ({ onFilterChange, categoryId }) => {
           </Box>
         </Box>
 
-        {categoryId === '1' && (
-            <Box mt={2}>
-              <FormControl component="fieldset" variant="standard">
-                <FormLabel component="legend">Producent</FormLabel>
-                <FormGroup>
-                  {Object.keys(filters.producers).map((producer) => (
-                      <FormControlLabel
-                          key={producer}
-                          control={
-                            <Checkbox
-                                name={producer}
-                                checked={filters.producers[producer]}
-                                onChange={(e) => handleCheckboxChange(e, 'producers')}
-                            />
-                          }
-                          label={producer}
-                      />
-                  ))}
-                </FormGroup>
-              </FormControl>
-            </Box>
-        )}
+        {/* Jeśli categoryId === "1" (lub cokolwiek innego), wyświetl listę producentów */}
+        <Box mt={2}>
+          <FormControl component="fieldset" variant="standard">
+            <FormLabel component="legend">Producent</FormLabel>
+            <FormGroup>
+              {Object.keys(filters.producers).map((producer) => (
+                  <FormControlLabel
+                      key={producer}
+                      control={
+                        <Checkbox
+                            name={producer}
+                            checked={filters.producers[producer]}
+                            onChange={(e) => handleCheckboxChange(e, 'producers')}
+                        />
+                      }
+                      label={producer}
+                  />
+              ))}
+            </FormGroup>
+          </FormControl>
+        </Box>
       </Box>
   );
-};
+}
 
+// Funkcja debounce
 function debounce(func, wait) {
   let timeout;
   return function (...args) {

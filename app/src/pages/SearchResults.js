@@ -13,6 +13,8 @@ function SearchResults() {
     const [isLoading, setIsLoading] = useState(true);
     const [filters, setFilters] = useState({});
     const [query, setQuery] = useState("");
+    const [uniqueProducers, setUniqueProducers] = useState([]);
+
 
     useEffect(() => {
         const searchQuery = new URLSearchParams(location.search).get("query");
@@ -21,9 +23,12 @@ function SearchResults() {
         const fetchSearchResults = async () => {
             try {
                 const response = await axios.get(`http://localhost:8081/api/products/search?query=${searchQuery}`);
-                console.log('Fetched search results:', response.data);
                 setProducts(response.data);
                 setIsLoading(false);
+
+                // Wyciągamy unikalnych producentów
+                const producersSet = new Set(response.data.map(p => p.producer).filter(Boolean));
+                setUniqueProducers([...producersSet]);
             } catch (error) {
                 console.error('Failed to fetch search results:', error);
             }
@@ -35,7 +40,6 @@ function SearchResults() {
     const handleFilterChange = (newFilters) => {
         console.log(newFilters);
         setFilters(newFilters);
-        // Apply filtering logic if needed
     };
 
     return (
@@ -54,7 +58,7 @@ function SearchResults() {
                     }}
                 >
                     <Box sx={{ mr: 1, minWidth: '250px' }}>
-                        <ProductFilter onFilterChange={handleFilterChange} />
+                        <ProductFilter onFilterChange={handleFilterChange} producers={uniqueProducers} />
                     </Box>
                     <Container
                         maxWidth="lg"

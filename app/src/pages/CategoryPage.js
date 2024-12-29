@@ -12,6 +12,7 @@ function CategoryPage() {
     const [products, setProducts] = useState([]);
     const [categoryName, setCategoryName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [uniqueProducers, setUniqueProducers] = useState([]);
     const [filters, setFilters] = useState({
         producers: [],
         priceFrom: '',
@@ -24,15 +25,20 @@ function CategoryPage() {
         const fetchCategoryData = async () => {
             try {
                 const response = await axios.get(`http://localhost:8081/api/categories/${categoryId}/products`);
-                console.log('Fetched category data:', response.data);
                 setProducts(response.data.products);
                 setCategoryName(response.data.categoryName);
                 setIsLoading(false);
+
+                // Wyciągamy unikalne nazwy producentów (pomijając puste)
+                const producersSet = new Set(response.data.products
+                    .map((p) => p.producer)
+                    .filter(Boolean)
+                );
+                setUniqueProducers([...producersSet]);
             } catch (error) {
                 console.error('Failed to fetch category data:', error);
             }
         };
-
         fetchCategoryData();
     }, [categoryId]);
 
@@ -80,7 +86,7 @@ function CategoryPage() {
                     }}
                 >
                     <Box sx={{ mr: 1, minWidth: '250px' }}>
-                        <ProductFilter onFilterChange={handleFilterChange} categoryId={categoryId} />
+                        <ProductFilter onFilterChange={handleFilterChange} categoryId={categoryId} producers={uniqueProducers} />
                     </Box>
                     <Container
                         maxWidth="lg"

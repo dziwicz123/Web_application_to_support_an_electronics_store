@@ -2,6 +2,7 @@ package com.example.web_application_to_support_electronics_store.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,7 +33,8 @@ public class SecurityConfig {
                                 "/api/categories",
                                 "/api/categories/**",
                                 "/api/products",
-                                "/api/products/**",
+                                "/api/products/admin",
+                                "/api/products/admin/**",
                                 "/api/products/search",
                                 "/api/basket",
                                 "/api/basket/user/**",
@@ -50,6 +52,9 @@ public class SecurityConfig {
                                 "/api/comments",
                                 "/api/comments/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -25,4 +25,11 @@ public class CategoryService {
             throw new RuntimeException("Category not found");
         }
     }
+
+    public Category getCategoryByName(String categoryName) {
+        return categoryRepository.findByCategoryName(categoryName)
+                .orElseThrow(() -> new RuntimeException(
+                        "Category with name '" + categoryName + "' not found"));
+    }
+
 }

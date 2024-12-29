@@ -18,11 +18,12 @@ public class ProductDTO {
     private int reviewCount;
     private String categoryName;
     private String description;
+    private String producer;
     private ProductQuantity quantityType;
 
     public ProductDTO(Long id, String productName, float rating, float price,
                       String image, Float cutPrice, int reviewCount,
-                      String categoryName, String description,
+                      String categoryName, String description, String producer,
                       ProductQuantity quantityType) {
         this.id = id;
         this.productName = productName;
@@ -33,6 +34,7 @@ public class ProductDTO {
         this.reviewCount = reviewCount;
         this.categoryName = categoryName;
         this.description = description;
+        this.producer = producer;
         this.quantityType = quantityType;
     }
 }

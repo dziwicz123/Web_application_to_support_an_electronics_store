@@ -50,6 +50,14 @@ const theme = createTheme({
     borderRadius: 8,
   },
   components: {
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          margin: 0,
+          padding: 0,
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {

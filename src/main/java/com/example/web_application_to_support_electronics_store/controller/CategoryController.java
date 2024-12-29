@@ -52,6 +52,7 @@ public class CategoryController {
                             product.getComments() != null ? product.getComments().size() : 0,
                             category.getCategoryName(),
                             product.getDescription(),
+                            product.getProducer(),
                             product.getQuantityType()
                     ))
                     .toList();

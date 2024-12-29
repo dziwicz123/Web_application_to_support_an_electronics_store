@@ -16,6 +16,10 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryService categoryService;
+
+
     public List<Product> getProductsByCategory(Long categoryId) {
         return productRepository.findByCategoryId(categoryId);
     }
@@ -58,6 +62,7 @@ public class ProductService {
                             reviewCount,
                             categoryName,
                             product.getDescription(),
+                            product.getProducer(),
                             product.getQuantityType()
                     );
                 })
@@ -80,5 +85,28 @@ public class ProductService {
     public Long getMaxProductId() {
         return productRepository.findMaxId().orElse(0L);
     }
+
+    public Product updateProduct(Long id, ProductDTO productDTO) {
+        // Pobierz produkt z bazy
+        Product product = getProductById(id);
+
+        // Zaktualizuj pola produktu na podstawie DTO
+        product.setProductName(productDTO.getProductName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        product.setProducer(productDTO.getProducer());
+        product.setQuantityType(productDTO.getQuantityType());
+        product.setCutPrice(productDTO.getCutPrice());
+        product.setImage(productDTO.getImage());
+
+        // Opcjonalnie: Zaktualizuj kategorię, jeśli jest w DTO
+        if (productDTO.getCategoryName() != null && !"Brak kategorii".equals(productDTO.getCategoryName())) {
+            product.setCategory(categoryService.getCategoryByName(productDTO.getCategoryName()));
+        }
+
+        // Zapisz zaktualizowany produkt w bazie
+        return productRepository.save(product);
+    }
+
 
 }

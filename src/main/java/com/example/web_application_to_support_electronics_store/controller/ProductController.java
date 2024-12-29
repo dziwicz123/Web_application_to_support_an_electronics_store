@@ -3,9 +3,14 @@ package com.example.web_application_to_support_electronics_store.controller;
 import com.example.web_application_to_support_electronics_store.DTO.AddProductDTO;
 import com.example.web_application_to_support_electronics_store.DTO.ProductDTO;
 import com.example.web_application_to_support_electronics_store.config.model.Product;
+import com.example.web_application_to_support_electronics_store.repo.ProductRepository;
 import com.example.web_application_to_support_electronics_store.service.CategoryService;
 import com.example.web_application_to_support_electronics_store.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +26,10 @@ public class ProductController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ProductRepository productRepository;
+
 
     @GetMapping("/search")
     public List<Product> searchProducts(@RequestParam String query) {
@@ -91,9 +100,30 @@ public class ProductController {
                 product.getComments() != null ? product.getComments().size() : 0, // Liczenie komentarzy
                 categoryName,
                 product.getDescription(),
+                product.getProducer(),
                 product.getQuantityType()
         );
 
         return ResponseEntity.ok(productDTO);
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<?> getAllProductsAdmin(
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        int size = 5;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Product> productPage = productRepository.findAll(pageable);
+        return ResponseEntity.ok(productPage);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+        // Aktualizuj produkt w serwisie
+        Product updatedProduct = productService.updateProduct(id, productDTO);
+
+        // Zwróć zaktualizowaną encję jako odpowiedź
+        return ResponseEntity.ok(updatedProduct);
+    }
+
 }

@@ -4,7 +4,16 @@ import { Box, Paper, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe('pk_test_51PQtgQ03dG9...'); // podmień na swój klucz publiczny
+const stripePromise = loadStripe('pk_test_51PQtgQ03dG9DcKmUHYPxw5W8tRpSdhpIuHvWH5KRsSi7WXxvD32zFrpWTM43eBLZJfWWh7vbzrJi9rrO2BviI6pK00bBqaArZu'); // podmień na swój klucz publiczny
+
+function parseLocalDateTimeArray(dateArray) {
+    // dateArray = [yyyy, MM, dd, HH, mm, ss]
+    // Uwaga: w JS miesiące liczymy od 0, więc trzeba odjąć 1
+    if (!Array.isArray(dateArray) || dateArray.length < 3) return null;
+    const [year, month, day, hour = 0, minute = 0, second = 0] = dateArray;
+    return new Date(year, month - 1, day, hour, minute, second);
+}
+
 
 const OrderSection = ({ user }) => {
     const [orders, setOrders] = useState([]);
@@ -100,7 +109,9 @@ const OrderSection = ({ user }) => {
                         </strong>
                     </Typography>
                     <Typography variant="body2" style={{ color: '#888888' }}>
-                        {new Date(order.orderDate).toLocaleDateString()}
+                        {order.orderDate
+                            ? parseLocalDateTimeArray(order.orderDate).toLocaleDateString()
+                            : 'Brak'}
                     </Typography>
                     <Typography variant="body2" style={{ color: '#888888' }}>
                         nr {order.id}

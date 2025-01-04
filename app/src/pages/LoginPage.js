@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css";
 import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -7,7 +7,6 @@ import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import Button from "@mui/material/Button";
 import AppNavbar from "../components/Navbar";
 import AppFooter from "../components/Footer";
-import { useAuth } from '../AuthContext';
 import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
@@ -18,8 +17,6 @@ function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
 
   const handleChange = (event) => {
     const { name, value } = event.target;

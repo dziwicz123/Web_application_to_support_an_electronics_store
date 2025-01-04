@@ -17,6 +17,14 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+function parseLocalDateTimeArray(dateArray) {
+    // dateArray = [yyyy, MM, dd, HH, mm, ss]
+    // Uwaga: w JS miesiące liczymy od 0, więc trzeba odjąć 1
+    if (!Array.isArray(dateArray) || dateArray.length < 3) return null;
+    const [year, month, day, hour = 0, minute = 0, second = 0] = dateArray;
+    return new Date(year, month - 1, day, hour, minute, second);
+}
+
 function Orders() {
     const [orders, setOrders] = useState([]);
     const [editingStatus, setEditingStatus] = useState({});
@@ -127,8 +135,16 @@ function Orders() {
                             >
                                 <TableCell>{order.basket.id}</TableCell>
                                 <TableCell>{order.basket.totalPrice}</TableCell>
-                                <TableCell>{order.orderDate}</TableCell>
-                                <TableCell>{order.shipDate ? order.shipDate : 'Nie wysłano'}</TableCell>
+                                <TableCell>
+                                    {order.orderDate
+                                        ? parseLocalDateTimeArray(order.orderDate).toLocaleDateString()
+                                        : 'Brak'}
+                                </TableCell>
+                                <TableCell>
+                                    {order.shipDate
+                                        ? parseLocalDateTimeArray(order.shipDate).toLocaleDateString()
+                                        : 'Nie wysłano'}
+                                </TableCell>
                                 <TableCell>
                                     <Select
                                         value={editingStatus[order.id] || order.state}

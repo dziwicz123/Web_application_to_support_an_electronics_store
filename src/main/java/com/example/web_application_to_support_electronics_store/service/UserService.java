@@ -31,11 +31,6 @@ public class UserService {
         this.basketRepository = basketRepository;
     }
 
-    public boolean checkLogin(User user) {
-        User foundUser = userRepository.findByEmail(user.getEmail());
-        return foundUser != null && passwordEncoder.matches(user.getPassword(), foundUser.getPassword());
-    }
-
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUserType(UserType.USER);
@@ -75,22 +70,8 @@ public class UserService {
         return null;
     }
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
-    }
-
     public List<User> getAllUsers() {
         return userRepository.findAll();
-    }
-
-    public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        basketRepository.deleteAll(user.getBaskets());
-        userRepository.deleteById(id);
     }
 
     public User banUser(Long id) {

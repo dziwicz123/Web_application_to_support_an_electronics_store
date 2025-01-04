@@ -21,7 +21,7 @@ const PaymentSuccess = () => {
                     console.error("Error updating payment status:", error);
                 });
 
-            sessionStorage.removeItem('basketId');
+            sessionStorage.removeItem("basketId");
         }
     }, []);
 
@@ -37,30 +37,49 @@ const PaymentSuccess = () => {
                     marginBottom: 3,
                     borderRadius: 7,
                     width: "100%",
+                    backgroundColor: "#DAC0A3", // Główne tło
                 }}
             >
-                <Container maxWidth="sm" style={{ textAlign: "center" }}>
+                <Container
+                    maxWidth="sm"
+                    sx={{
+                        textAlign: "center",
+                        backgroundColor: "#EADBC8", // Jasne tło wewnątrz
+                        borderRadius: 3,
+                        py: 4,
+                        boxShadow: 3,
+                    }}
+                >
                     <Box
                         display="flex"
                         flexDirection="column"
                         alignItems="center"
-                        p={3}
-                        boxShadow={3}
-                        borderRadius={8}
-                        backgroundColor={"white"}
+                        mb={2}
                     >
-                        <CheckCircleIcon style={{ fontSize: 80, color: "green" }} />
-                        <Typography variant="h4" gutterBottom>
+                        <CheckCircleIcon
+                            sx={{ fontSize: 80, color: "#102C57", mb: 2 }} // ikona w ciemnym niebieskim
+                        />
+                        <Typography variant="h4" gutterBottom sx={{ color: "#0F044C" }}>
                             Płatność przebiegła pomyślnie!
                         </Typography>
-                        <Typography variant="body1" gutterBottom>
+                        <Typography variant="body1" gutterBottom sx={{ color: "#102C57" }}>
                             Dziękujemy za dokonanie płatności. Twoja transakcja została
                             pomyślnie zakończona.
                         </Typography>
-                        <Button variant="contained" color="primary" href="/">
-                            Powrót do strony głównej
-                        </Button>
                     </Box>
+                    <Button
+                        variant="contained"
+                        href="/"
+                        sx={{
+                            backgroundColor: "#102C57", // ciemny niebieski
+                            color: "#FEFAF6",           // jasny tekst
+                            "&:hover": {
+                                backgroundColor: "#0F044C", // jeszcze ciemniejszy niebieski przy hoverze
+                            },
+                        }}
+                    >
+                        Powrót do strony głównej
+                    </Button>
                 </Container>
             </Box>
             <Footer />

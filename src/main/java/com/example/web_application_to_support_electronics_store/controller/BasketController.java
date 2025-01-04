@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,13 +27,22 @@ public class BasketController {
     private UserRepository userRepository;
 
     @PostMapping("/add")
-    public ResponseEntity<?> createBasket(Principal principal) {
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            return ResponseEntity.status(401).body("User not authenticated");
+    public ResponseEntity<?> createBasket(@RequestBody Map<String, Object> payload) {
+        // Odczytaj userId z ciała żądania
+        if (!payload.containsKey("userId")) {
+            return ResponseEntity.badRequest().body("userId is required");
         }
-        
+        Number userIdNumber = (Number) payload.get("userId");
+        Long userId = userIdNumber.longValue();
+
+        // Znajdź użytkownika
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        User user = userOpt.get();
+
+        // Stwórz nowy koszyk
         Basket basket = new Basket();
         basket.setUser(user);
         basket.setState(false);

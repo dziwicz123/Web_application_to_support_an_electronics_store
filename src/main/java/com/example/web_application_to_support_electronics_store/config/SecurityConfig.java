@@ -14,16 +14,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // Haszowanie haseł - BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Główna konfiguracja Spring Security
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // Włącza CORS i wyłącza CSRF (jeśli nie używasz tokenów CSRF)
                 .cors().and()
                 .csrf().disable()
+
+                // Konfiguracja, które requesty są dozwolone bez autentykacji
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 "/login",
@@ -52,16 +57,21 @@ public class SecurityConfig {
                                 "/api/comments",
                                 "/api/comments/**"
                         ).permitAll()
+
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+
+                        // Każde inne żądanie wymaga autentykacji
                         .anyRequest().authenticated()
                 )
+
+                // Ustawianie zasad sesji
+                // Jeśli używasz sesji do przechowywania zalogowanego usera:
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .invalidSessionUrl("/login")
                 );
-
         return http.build();
     }
 }

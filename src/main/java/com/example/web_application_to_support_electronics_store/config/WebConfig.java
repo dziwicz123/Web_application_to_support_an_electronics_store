@@ -10,6 +10,9 @@ import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    // Konfiguracja CORS - pozwala aplikacji front-end (http://localhost:3000)
+    // wysyłać zapytania do back-endu (http://localhost:8081), w tym metody PUT, DELETE itd.
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -19,6 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
+    // Konwerter JSON z obsługą charset=UTF-8
     @Bean
     public MappingJackson2HttpMessageConverter customJackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();

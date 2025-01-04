@@ -32,7 +32,7 @@ function AdminHeader(props) {
 
     const handleLogout = () => {
         // Wylogowanie - usunięcie danych z sessionStorage
-        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
         sessionStorage.removeItem('basket');
         navigate('/login');
     };

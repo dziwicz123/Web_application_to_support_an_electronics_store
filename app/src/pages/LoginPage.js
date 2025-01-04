@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import AppNavbar from "../components/Navbar";
 import AppFooter from "../components/Footer";
 import { useAuth } from '../AuthContext';
+import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
   const [formData, setFormData] = useState({
@@ -39,32 +40,38 @@ function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData), // { email, password }
       });
 
       const res = await response.json();
+      console.log("Login response:", res);
 
-      if (response.ok && res.status && res.user) {
-        // Wywołaj login z kontekstu:
-        login(res.user);
+      if (response.ok && res.status && res.token) {
+        // 1. Zapisz token w sessionStorage
+        sessionStorage.setItem("token", res.token);
 
-        // Zapis koszyka jeśli potrzeba:
+        // 2. Dekoduj token, aby poznać userType i ewentualne inne dane
+        const decoded = jwtDecode(res.token);
+        const userType = decoded.userType; // np. "ADMIN" lub "USER"
+
+        // 3. Zdecyduj o przekierowaniu na podstawie userType
+        if (userType === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/profile");
+        }
+
+        // 4. Jeśli backend wciąż zwraca basketId, zapisz w sessionStorage
         if (res.basketId) {
           sessionStorage.setItem("basketId", res.basketId);
         }
 
-        // Redirect based on user type
-        if (res.user.userType === "ADMIN") {
-          navigate("/admin");
-        } else {
-          const redirectTo = location.state?.from || "/";
-          navigate(redirectTo);
-        }
       } else if (response.status === 403) {
         setErrorMessage(res.message || "Your account is banned. Please contact support.");
       } else {
         setErrorMessage(res.message || "Failed to log in. Please try again.");
       }
+
     } catch (error) {
       console.error("Error logging in:", error);
       setErrorMessage("An error occurred while trying to log in. Please try again.");

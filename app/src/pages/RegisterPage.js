@@ -55,16 +55,22 @@ function RegisterPage() {
             const loginData = await loginResponse.json();
             console.log("Login response:", loginData);
 
-            if (loginData.status && loginData.user) {
-              sessionStorage.setItem("user", JSON.stringify(loginData.user));
-              console.log("User logged in successfully:", loginData);
+            // Sprawdzamy, czy mamy token
+            if (loginData.status && loginData.token) {
+              // Zapisujemy token
+              sessionStorage.setItem("token", loginData.token);
 
-              // Save basket ID
+              // Jeżeli wciąż jest basketId, zapisujemy koszyk
               if (loginData.basketId) {
                 sessionStorage.setItem("basketId", loginData.basketId);
               }
 
-              navigate("/"); // Redirect to HomePage
+              // Przekierowujemy na stronę główną lub do /admin
+              if (loginData.token.userType === "ADMIN") {
+                navigate("/admin");
+              } else {
+                navigate("/");
+              }
             } else {
               console.error("Failed to log in:", loginData.message);
             }

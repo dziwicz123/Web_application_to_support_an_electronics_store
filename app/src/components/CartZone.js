@@ -41,7 +41,7 @@ const CartZone = () => {
       alert("Twój koszyk jest pusty. Dodaj produkty do koszyka przed przejściem do dostawy.");
       return;
     }
-    const user = sessionStorage.getItem('user');
+    const user = sessionStorage.getItem('token');
     if (user) {
       navigate('/delivery');
     } else {

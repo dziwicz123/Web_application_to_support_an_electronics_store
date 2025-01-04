@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Typography, Paper, Divider } from '@mui/material';
+import { jwtDecode } from "jwt-decode";
 
 const UserComments = () => {
     const [comments, setComments] = useState([]);
-    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const userJson = sessionStorage.getItem('user');
-        const loggedUser = userJson ? JSON.parse(userJson) : null;
-        setUser(loggedUser);
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            console.error("No token found, user is not logged in.");
+            return;
+        }
 
-        if (loggedUser && loggedUser.email) {
+        try {
+            // 1. Dekoduj token, aby uzyskać email z pola `sub` (lub innego claimu)
+            const decoded = jwtDecode(token);
+            const email = decoded.sub;
+            // Załóżmy, że w JwtUtil masz .withSubject(user.getEmail()) => sub = email
+
+            // 2. Wywołanie endpointu, z nagłówkiem Authorization
             const fetchComments = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:8081/api/comments/user/${loggedUser.email}`, {
-                        withCredentials: true,
-                    });
+                    const response = await axios.get(
+                        `http://localhost:8081/api/comments/user/${email}`,
+                        {
+                            headers: {
+                                "Authorization": `Bearer ${token}`
+                            }
+                        }
+                    );
                     setComments(response.data);
                 } catch (error) {
                     console.error('Error fetching user comments:', error);
@@ -24,12 +37,10 @@ const UserComments = () => {
             };
 
             fetchComments();
+        } catch (error) {
+            console.error("Error decoding JWT token:", error);
         }
     }, []);
-
-    if (!user) {
-        return <Typography>Loading...</Typography>;
-    }
 
     return (
         <Box>

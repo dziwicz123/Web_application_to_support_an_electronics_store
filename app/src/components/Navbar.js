@@ -71,7 +71,7 @@ const AppNavbar = () => {
     }, []);
 
     useEffect(() => {
-        setIsLoggedIn(Boolean(sessionStorage.getItem('user')));
+        setIsLoggedIn(Boolean(sessionStorage.getItem('token')));
     }, []);
 
     const handleCategoryClick = (categoryId) => {

@@ -3,28 +3,31 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    // Zamiast user – przechowujemy token
+    const [token, setToken] = useState(null);
 
     useEffect(() => {
-        // Check sessionStorage for user data
-        const storedUser = sessionStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        // Sprawdzamy, czy w sessionStorage jest zapamiętany token
+        const storedToken = sessionStorage.getItem('token');
+        if (storedToken) {
+            setToken(storedToken);
         }
     }, []);
 
-    const login = (userData) => {
-        setUser(userData);
-        sessionStorage.setItem('user', JSON.stringify(userData));
+    // Funkcja login – przyjmuje token
+    const login = (newToken) => {
+        setToken(newToken);
+        sessionStorage.setItem('token', newToken);
     };
 
+    // Funkcja logout – usuwa token
     const logout = () => {
-        setUser(null);
-        sessionStorage.removeItem('user');
+        setToken(null);
+        sessionStorage.removeItem('token');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

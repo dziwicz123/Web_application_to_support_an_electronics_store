@@ -1,5 +1,6 @@
 package com.example.web_application_to_support_electronics_store.controller;
 
+import com.example.web_application_to_support_electronics_store.config.jwt.JwtUtil;
 import com.example.web_application_to_support_electronics_store.config.model.Basket;
 import com.example.web_application_to_support_electronics_store.config.model.User;
 import com.example.web_application_to_support_electronics_store.repo.BasketRepository;
@@ -21,28 +22,35 @@ public class BasketController {
     private BasketRepository basketRepository;
 
     @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> createBasket(@RequestBody Map<String, Object> payload) {
-        // Odczytaj userId z ciała żądania
-        if (!payload.containsKey("userId")) {
-            return ResponseEntity.badRequest().body("userId is required");
-        }
-        Number userIdNumber = (Number) payload.get("userId");
-        Long userId = userIdNumber.longValue();
+    @Autowired
+    private JwtUtil jwtUtil;
 
-        // Znajdź użytkownika
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (!userOpt.isPresent()) {
+    @PostMapping("/add")
+    public ResponseEntity<?> createBasket(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        String token = authHeader.substring(7); // Usuń "Bearer "
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(401).body("Invalid token");
+        }
+
+        String email = jwtUtil.getSubject(token);
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
             return ResponseEntity.status(404).body("User not found");
         }
-        User user = userOpt.get();
 
-        // Stwórz nowy koszyk
+        // Sprawdź, czy istnieje otwarty koszyk
+        Basket existingBasket = basketRepository.findByUserAndState(user, false);
+        if (existingBasket != null) {
+            return ResponseEntity.ok(existingBasket);
+        }
+
+        // Utwórz nowy koszyk
         Basket basket = new Basket();
         basket.setUser(user);
         basket.setState(false);

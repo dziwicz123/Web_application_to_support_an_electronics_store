@@ -81,19 +81,18 @@ const DeliveryForm = () => {
 
         // 2. Dekoduj token, by uzyskać email (assuming sub = email)
         const decoded = jwtDecode(token);
-        const userEmail = decoded.sub; // sprawdź w backendzie czy sub = email
+        const userEmail = decoded.sub;
 
         // 3. Pobierz lub stwórz basketId
         let basketId = sessionStorage.getItem('basketId');
         if (!basketId) {
-          // Jeśli nie ma w sessionStorage, to tworzymy nowy koszyk
-          // (o ile Twój backend to obsługuje, np. endpoint /api/basket/add)
+          // Jeśli nie ma w sessionStorage, tworzymy nowy koszyk
           const newBasketResponse = await axios.post(
               'http://localhost:8081/api/basket/add',
-              {}, // Brak ciała, bo backend może pobierać usera z tokenu
+              null, // Brak ciała, tylko nagłówek
               {
                 headers: {
-                  Authorization: `Bearer ${token}`, // Wysyłamy token w nagłówku
+                  Authorization: `Bearer ${token}`,
                 },
               }
           );

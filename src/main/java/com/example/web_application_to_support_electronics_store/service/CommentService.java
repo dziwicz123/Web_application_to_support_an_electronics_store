@@ -42,16 +42,18 @@ public class CommentService {
     public List<CommentDTO> getCommentsByUserEmail(String userEmail) {
         List<Comment> comments = commentRepository.findByUserEmail(userEmail);
 
-        return comments.stream().map(comment -> {
-            CommentDTO dto = new CommentDTO();
-            dto.setId(comment.getId());
-            dto.setRating(comment.getRating());
-            dto.setDescription(comment.getDescription());
-            dto.setUsername(comment.getUser().getName()); // Assuming User has a `name` field
-            dto.setProductName(comment.getProduct().getProductName()); // If needed
-            dto.setProductImage(comment.getProduct().getImage()); // If needed
-            dto.setProductId(comment.getProduct().getId()); // Set productId
-            return dto;
-        }).collect(Collectors.toList());
+        return comments.stream()
+                .map(comment -> {
+                    CommentDTO dto = new CommentDTO();
+                    dto.setId(comment.getId());
+                    dto.setRating(comment.getRating());
+                    dto.setDescription(comment.getDescription());
+
+                    dto.setProductId(comment.getProduct().getId());
+                    dto.setProductName(comment.getProduct().getProductName());
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

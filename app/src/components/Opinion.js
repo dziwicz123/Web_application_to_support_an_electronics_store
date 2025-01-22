@@ -6,7 +6,8 @@ const Opinion = ({ productId, onOpinionAdded }) => {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const [loading, setLoading] = useState(false);
-    const user = JSON.parse(sessionStorage.getItem("user"));
+
+    const token = sessionStorage.getItem("token");
 
     const handleSubmit = async () => {
         if (rating < 1 || rating > 5) {
@@ -21,12 +22,20 @@ const Opinion = ({ productId, onOpinionAdded }) => {
         setLoading(true);
 
         try {
-            await axios.post("http://localhost:8081/api/comments", {
-                productId,
-                userId: user.id,
-                rating,
-                description: comment,
-            });
+            await axios.post(
+                "http://localhost:8081/api/comments",
+                {
+                    productId,
+                    rating,
+                    description: comment,
+                    // NIE WYSYŁAMY userId, bo bierzemy z tokena
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             alert("Opinia została dodana");
             onOpinionAdded();

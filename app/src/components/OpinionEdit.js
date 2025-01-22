@@ -1,16 +1,15 @@
-import React, { useState } from "react"; // Import useState
-import { Button, TextField, Typography, Rating, Paper } from "@mui/material"; // Import komponentów MUI
-import axios from "axios"; // Import axios
+import React, { useState } from "react";
+import { Button, TextField, Typography, Rating, Paper } from "@mui/material";
+import axios from "axios";
 
 const OpinionEdit = ({ existingOpinion, productId, onOpinionUpdated }) => {
-    // Zainicjalizuj wartości domyślne
     const [rating, setRating] = useState(existingOpinion ? existingOpinion.rating : 0);
     const [comment, setComment] = useState(existingOpinion ? existingOpinion.description : "");
     const [loading, setLoading] = useState(false);
-    const user = JSON.parse(sessionStorage.getItem("user"));
+
+    const token = sessionStorage.getItem("token");
 
     if (!existingOpinion) {
-        // Jeśli brak opinii, renderuj pusty fragment
         return null;
     }
 
@@ -27,12 +26,20 @@ const OpinionEdit = ({ existingOpinion, productId, onOpinionUpdated }) => {
         setLoading(true);
 
         try {
-            await axios.put(`http://localhost:8081/api/comments/${existingOpinion.id}`, {
-                productId,
-                userId: user.id,
-                rating,
-                description: comment,
-            });
+            await axios.put(
+                `http://localhost:8081/api/comments/${existingOpinion.id}`,
+                {
+                    productId, // ewentualnie do weryfikacji na backendzie, czy zgadza się z komentarzem
+                    rating,
+                    description: comment,
+                    // NIE WYSYŁAMY userId
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             alert("Opinia została zaktualizowana");
             onOpinionUpdated();

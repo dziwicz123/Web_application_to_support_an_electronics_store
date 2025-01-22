@@ -5,7 +5,6 @@ import AppFooter from "../components/Footer";
 import ImageSlider from "../components/Slider";
 import PromotedProducts from "../components/PromotedProducts";
 import PromotionalProducts from "../components/PromotionalProducts";
-// import CookiesPopup from "../components/CookiesPopup";
 
 function HomePage() {
     return (

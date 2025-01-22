@@ -64,7 +64,6 @@ function RegisterPage() {
         const userData = await response.json();
         console.log("User registered successfully:", userData);
 
-        // Po poprawnej rejestracji – logowanie
         const loginResponse = await fetch("http://localhost:8081/api/login", {
           method: "POST",
           headers: {

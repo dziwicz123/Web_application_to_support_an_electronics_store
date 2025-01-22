@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Box, Paper, Typography, Button, Pagination, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
-import jwtDecode from 'jwt-decode'; // Upewnij się, że importujesz poprawnie
+import jwtDecode from 'jwt-decode';
 
 const stripePromise = loadStripe('pk_test_51PQtgQ03dG9DcKmUHYPxw5W8tRpSdhpIuHvWH5KRsSi7WXxvD32zFrpWTM43eBLZJfWWh7vbzrJi9rrO2BviI6pK00bBqaArZu'); // podmień na swój klucz publiczny
 

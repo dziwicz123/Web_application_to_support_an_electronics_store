@@ -16,6 +16,9 @@ import AdminPage from "./pages/AdminPage";
 import PaymentSuccess from "./pages/Succes";
 import PaymentFailure from "./pages/Failure";
 import Terms from './pages/Terms';
+import About from "./pages/About";
+import CustomerService from "./pages/CustomerService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function App() {
     return (
@@ -35,6 +38,9 @@ function App() {
                     <Route path="/success" element={<PaymentSuccess />} />
                     <Route path="/cancel" element={<PaymentFailure />} />
                     <Route path="/terms" element={<Terms />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/customer-service" element={<CustomerService />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/admin" element={
                         <ProtectedRoute requiredUserType="ADMIN">
                             <AdminPage />

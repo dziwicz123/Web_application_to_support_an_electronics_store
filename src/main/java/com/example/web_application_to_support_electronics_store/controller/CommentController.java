@@ -41,51 +41,56 @@ public class CommentController {
             @RequestBody Map<String, Object> payload
     ) {
         try {
-            // 1. Sprawdź, czy mamy nagłówek i czy zaczyna się od "Bearer "
+            // 1. Weryfikacja nagłówka i tokena
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body("Missing or invalid Authorization header");
             }
+            String token = authHeader.substring(7); // usunięcie "Bearer "
 
-            // 2. Wyciągamy token i weryfikujemy
-            String token = authHeader.substring(7); // "Bearer ".length() = 7
             if (!jwtUtil.validateToken(token)) {
                 return ResponseEntity.status(401).body("Invalid or expired token");
             }
 
-            // 3. Odczytujemy email (sub) z tokena i wyszukujemy usera w bazie
+            // 2. Pobranie email (sub) z tokena i wyszukanie użytkownika
             String userEmail = jwtUtil.getSubject(token);
             User user = userRepository.findByEmail(userEmail);
             if (user == null) {
                 return ResponseEntity.status(404).body("User not found");
             }
 
-            // 4. Odczyt parametrów z payload (ale już nie userId!)
+            // 3. Odczyt parametrów (productId, rating, description) z payload
             Long productId = Long.valueOf(payload.get("productId").toString());
             int rating = Integer.parseInt(payload.get("rating").toString());
             String description = payload.get("description").toString();
 
-            // 5. Walidacja productId
+            // 4. Sprawdzenie, czy istnieje taki produkt
             Optional<Product> productOpt = productRepository.findById(productId);
             if (!productOpt.isPresent()) {
                 return ResponseEntity.status(404).body("Produkt o podanym ID nie istnieje");
             }
             Product product = productOpt.get();
 
-            // 6. Zbuduj obiekt komentarza
+            // 5. Zbudowanie i zapis komentarza
             Comment comment = new Comment();
             comment.setProduct(product);
             comment.setUser(user);
             comment.setRating(rating);
             comment.setDescription(description);
 
-            // 7. Zapis w repo
             commentRepository.save(comment);
 
+            // 6. Ponowne przeliczenie ratingu w produkcie
+            commentService.updateProductRatingAfterComment(productId);
+
+            // 7. Zwrócenie powodzenia
             return ResponseEntity.ok("Komentarz został dodany");
+
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Błąd podczas dodawania komentarza");
+            // W razie nieoczekiwanego błędu:
+            return ResponseEntity.status(500).body("Błąd podczas dodawania komentarza: " + e.getMessage());
         }
     }
+
 
 
     @GetMapping("/product/{productId}")

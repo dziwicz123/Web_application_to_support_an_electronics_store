@@ -2,6 +2,7 @@ package com.example.web_application_to_support_electronics_store.service;
 
 import com.example.web_application_to_support_electronics_store.config.model.Comment;
 import com.example.web_application_to_support_electronics_store.DTO.CommentDTO;
+import com.example.web_application_to_support_electronics_store.config.model.Product;
 import com.example.web_application_to_support_electronics_store.repo.CommentRepository;
 import com.example.web_application_to_support_electronics_store.repo.ProductRepository;
 import com.example.web_application_to_support_electronics_store.repo.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,5 +57,38 @@ public class CommentService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void recalcProductRating(Long productId) {
+        // Pobierz wszystkie komentarze danego produktu
+        List<Comment> comments = commentRepository.findByProductId(productId);
+
+        // Oblicz średnią ocen
+        if (comments.isEmpty()) {
+            // Jeśli nie ma komentarzy, rating = 0
+            Optional<Product> productOpt = productRepository.findById(productId);
+            productOpt.ifPresent(prod -> {
+                prod.setRating(0f);
+                productRepository.save(prod);
+            });
+        } else {
+            float sum = 0f;
+            for (Comment c : comments) {
+                sum += c.getRating();
+            }
+            float avg = sum / comments.size();
+
+            // Zaktualizuj pole rating w encji Product
+            Optional<Product> productOpt = productRepository.findById(productId);
+            if (productOpt.isPresent()) {
+                Product product = productOpt.get();
+                product.setRating(avg);
+                productRepository.save(product);
+            }
+        }
+    }
+
+    public void updateProductRatingAfterComment(Long productId) {
+        recalcProductRating(productId);
     }
 }

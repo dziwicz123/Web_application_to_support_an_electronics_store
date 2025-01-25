@@ -16,6 +16,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import StarIcon from "@mui/icons-material/Star";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 
 import AppNavbar from "../components/Navbar";
 import AppFooter from "../components/Footer";
@@ -172,8 +175,20 @@ const ProductPage = () => {
         return line;
     };
 
-    // Czy user jest zalogowany?
-    // Prostym wskaźnikiem w tym przykładzie jest "czy jest token i userEmail"
+    const renderStars = (rating) => {
+        return Array.from({ length: 5 }, (_, index) => {
+            const starRating = index + 1;
+
+            if (rating >= starRating) {
+                return <StarIcon key={index} sx={{ color: "gold" }} fontSize="large" />;
+            } else if (rating >= starRating - 0.5) {
+                return <StarHalfIcon key={index} sx={{ color: "gold" }} fontSize="large" />;
+            } else {
+                return <StarBorderIcon key={index} sx={{ color: "gold" }} fontSize="large" />;
+            }
+        });
+    };
+
     const isUserLoggedIn = !!(token && userEmail);
 
     return (
@@ -256,12 +271,7 @@ const ProductPage = () => {
                                 mt: 2,
                             }}
                         >
-                            <Rating
-                                value={product.rating || 0}
-                                precision={0.5}
-                                readOnly
-                                size="large"
-                            />
+                            {renderStars(product.rating || 0)}
                             <Typography
                                 sx={{
                                     ml: 1,

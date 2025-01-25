@@ -9,7 +9,7 @@ const UserComments = () => {
 
     // Stan do paginacji
     const [currentPage, setCurrentPage] = useState(1);
-    const commentsPerPage = 3; // np. 3 komentarze na stronę (zmień wg potrzeb)
+    const commentsPerPage = 3; // np. 3 komentarze na stronę
 
     useEffect(() => {
         const token = sessionStorage.getItem("token");
@@ -18,7 +18,7 @@ const UserComments = () => {
             return;
         }
         try {
-            const decoded = jwtDecode(token);
+            const decoded = jwtDecode(token); // Import domyślny: import jwtDecode from 'jwt-decode';
             const email = decoded.sub;
             const fetchComments = async () => {
                 try {
@@ -41,15 +41,16 @@ const UserComments = () => {
         }
     }, []);
 
-    // Wyliczamy indeksy początkowy i końcowy w zależności od aktualnej strony
+    // Wyliczamy indeksy do paginacji
     const indexOfLastComment = currentPage * commentsPerPage;
     const indexOfFirstComment = indexOfLastComment - commentsPerPage;
     const currentComments = comments.slice(indexOfFirstComment, indexOfLastComment);
 
-    // Ilość stron = zaokrąglony w górę iloraz (liczba wszystkich komentarzy / komentarze na stronę)
-    const totalPages = Math.ceil(comments.length / commentsPerPage);
+    // Obliczamy łączną liczbę stron (co najmniej 1)
+    const totalPagesRaw = Math.ceil(comments.length / commentsPerPage);
+    const totalPages = totalPagesRaw < 1 ? 1 : totalPagesRaw;
 
-    // Handler zmiany strony
+    // Obsługa zmiany strony
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
     };
@@ -60,48 +61,36 @@ const UserComments = () => {
                 Twoje Komentarze
             </Typography>
 
-            {/* Renderujemy tylko komentarze z aktualnej strony */}
+            {/* Renderujemy komentarze z aktualnej strony */}
             {currentComments.length > 0 ? (
                 currentComments.map((comment) => (
-                    <Paper
+                    // <Link> obejmuje cały <Paper>, co sprawia,
+                    // że kliknięcie w dowolne miejsce komentarza
+                    // przenosi do strony /product/{productId}
+                    <Link
                         key={comment.id}
-                        elevation={3}
-                        style={{
-                            marginBottom: '16px',
-                            padding: '16px',
-                            backgroundColor: '#FEFAF6',
-                            borderLeft: '4px solid #102C57',
-                        }}
+                        to={`/product/${comment.productId}`}
+                        style={{ textDecoration: 'none', color: 'inherit' }}
                     >
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="space-between"
+                        <Paper
+                            elevation={3}
+                            sx={{
+                                mb: 2,
+                                p: 2,
+                                backgroundColor: '#FEFAF6',
+                                borderLeft: '4px solid #102C57',
+                                display: 'flex',         // <-- ułożenie w wierszu
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 2,
+                            }}
                         >
-                            <Box mr={2} flex="1">
-                                <Typography variant="body1" gutterBottom>
-                                    <strong>Produkt:</strong>{' '}
-                                    <Link
-                                        to={`/product/${comment.productId}`}
-                                        style={{
-                                            textDecoration: 'none',
-                                            color: 'black'
-                                        }}
-                                    >
-                                        {comment.productName}
-                                    </Link>
-                                </Typography>
-                                <Typography variant="body1" gutterBottom>
-                                    <strong>Ocena:</strong> {comment.rating}/5
-                                </Typography>
-                                <Typography variant="body2">
-                                    {comment.description}
-                                </Typography>
-                            </Box>
+                            {/* Sekcja ze zdjęciem produktu (lewa strona) */}
                             <Box
                                 sx={{
                                     width: 80,
-                                    height: 80
+                                    height: 80,
+                                    flexShrink: 0,         // nie pozwalamy się zmniejszać
                                 }}
                             >
                                 {comment.productImage && (
@@ -116,25 +105,36 @@ const UserComments = () => {
                                     />
                                 )}
                             </Box>
-                        </Box>
-                        <Divider style={{ margin: '8px 0' }} />
-                    </Paper>
+
+                            {/* Sekcja z treścią komentarza (prawa strona) */}
+                            <Box flex="1">
+                                <Typography variant="body1" gutterBottom>
+                                    <strong>Produkt:</strong> {comment.productName}
+                                </Typography>
+                                <Typography variant="body1" gutterBottom>
+                                    <strong>Ocena:</strong> {comment.rating}/5
+                                </Typography>
+                                <Typography variant="body2">
+                                    {comment.description}
+                                </Typography>
+                                <Divider sx={{ mt: 1 }} />
+                            </Box>
+                        </Paper>
+                    </Link>
                 ))
             ) : (
                 <Typography>Brak komentarzy do wyświetlenia.</Typography>
             )}
 
-            {/* Komponent paginacji */}
-            {comments.length > 0 && (
-                <Stack spacing={2} sx={{ mt: 2 }} alignItems="center">
-                    <Pagination
-                        count={totalPages}
-                        page={currentPage}
-                        onChange={handlePageChange}
-                        color="primary"
-                    />
-                </Stack>
-            )}
+            {/* Komponent paginacji - zawsze widoczny */}
+            <Stack spacing={2} sx={{ mt: 2 }} alignItems="center">
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                />
+            </Stack>
         </Box>
     );
 };

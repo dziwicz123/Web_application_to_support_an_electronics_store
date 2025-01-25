@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import jwtDecode from 'jwt-decode';
 
-const stripePromise = loadStripe('pk_test_51PQtgQ03dG9DcKmUHYPxw5W8tRpSdhpIuHvWH5KRsSi7WXxvD32zFrpWTM43eBLZJfWWh7vbzrJi9rrO2BviI6pK00bBqaArZu'); // podmień na swój klucz publiczny
+const stripePromise = loadStripe('pk_test_51PQtgQ03...'); // Podmień na swój klucz publiczny
 
 function parseLocalDateTimeArray(dateArray) {
-    // dateArray = [yyyy, MM, dd, HH, mm, ss]
-    // Uwaga: w JS miesiące liczymy od 0, więc trzeba odjąć 1
     if (!Array.isArray(dateArray) || dateArray.length < 3) return null;
     const [year, month, day, hour = 0, minute = 0, second = 0] = dateArray;
     return new Date(year, month - 1, day, hour, minute, second);
@@ -19,9 +17,9 @@ const OrderSection = ({ user }) => {
     const [orders, setOrders] = useState([]);
     const navigate = useNavigate();
 
-    // Stany do paginacji
+    // Paginacja
     const [currentPage, setCurrentPage] = useState(1);
-    const ordersPerPage = 5; // Liczba zamówień na stronę
+    const ordersPerPage = 5;
 
     useEffect(() => {
         const token = sessionStorage.getItem("token");
@@ -39,7 +37,7 @@ const OrderSection = ({ user }) => {
                 });
                 let fetchedOrders = response.data;
 
-                // Posortuj od najnowszych do najstarszych
+                // Sortuj od najnowszych do najstarszych
                 fetchedOrders.sort((a, b) => {
                     const dateA = a.orderDate ? parseLocalDateTimeArray(a.orderDate) : new Date(0);
                     const dateB = b.orderDate ? parseLocalDateTimeArray(b.orderDate) : new Date(0);
@@ -47,7 +45,7 @@ const OrderSection = ({ user }) => {
                 });
 
                 setOrders(fetchedOrders);
-                setCurrentPage(1); // Resetowanie strony po pobraniu zamówień
+                setCurrentPage(1);
             } catch (error) {
                 console.error('Error fetching orders:', error);
             }
@@ -56,7 +54,7 @@ const OrderSection = ({ user }) => {
         fetchOrders();
     }, [navigate]);
 
-    // Funkcja obsługująca płatność
+    // Obsługa płatności (Stripe)
     const handlePayment = async (order) => {
         try {
             const token = sessionStorage.getItem("token");
@@ -65,12 +63,9 @@ const OrderSection = ({ user }) => {
                 return;
             }
 
-            // Usuwamy poprzedni basketId (o ile istnieje)
             sessionStorage.removeItem('basketId');
-            // Zapisujemy nowy
             sessionStorage.setItem('basketId', order.basket.id);
 
-            // Tworzymy sesję płatności w Stripe
             const stripe = await stripePromise;
             const stripeResponse = await axios.post(
                 'http://localhost:8081/api/payment/create-checkout-session',
@@ -80,14 +75,12 @@ const OrderSection = ({ user }) => {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, // <-- ważne
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );
 
             const sessionId = stripeResponse.data.sessionId;
-
-            // Przekierowanie do Stripe Checkout
             const { error } = await stripe.redirectToCheckout({ sessionId });
             if (error) {
                 console.error('Error redirecting to Stripe Checkout:', error);
@@ -98,19 +91,20 @@ const OrderSection = ({ user }) => {
     };
 
     // Filtrowanie zamówień tylko dla zalogowanego usera
-    // Zwróć uwagę, że w tokenie musisz mieć userId -> user.userId
-    // W bazie: order.basket.user.id
     const userOrders = user
         ? orders.filter((order) => order.basket.user.id === user.userId)
         : [];
 
-    // Wyliczamy indeksy zamówień dla aktualnej strony
+    // Wyliczanie paginacji
+    const totalPagesRaw = Math.ceil(userOrders.length / ordersPerPage);
+    // Wymuszamy, by min. była 1 strona (aby zawsze pokazywać paginację)
+    const totalPages = totalPagesRaw < 1 ? 1 : totalPagesRaw;
+
     const indexOfLastOrder = currentPage * ordersPerPage;
     const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
     const currentOrders = userOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-    const totalPages = Math.ceil(userOrders.length / ordersPerPage);
 
-    // Handler zmiany strony
+    // Obsługa zmiany strony
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
     };
@@ -168,17 +162,15 @@ const OrderSection = ({ user }) => {
                 <Typography>Brak zamówień do wyświetlenia.</Typography>
             )}
 
-            {/* Komponent paginacji */}
-            {totalPages > 1 && (
-                <Stack spacing={2} sx={{ mt: 2 }} alignItems="center">
-                    <Pagination
-                        count={totalPages}
-                        page={currentPage}
-                        onChange={handlePageChange}
-                        color="primary"
-                    />
-                </Stack>
-            )}
+            {/* Paginacja zawsze widoczna */}
+            <Stack spacing={2} sx={{ mt: 2 }} alignItems="center">
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                />
+            </Stack>
         </Box>
     );
 };

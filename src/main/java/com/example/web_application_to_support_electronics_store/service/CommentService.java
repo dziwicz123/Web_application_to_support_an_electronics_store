@@ -51,8 +51,15 @@ public class CommentService {
                     dto.setRating(comment.getRating());
                     dto.setDescription(comment.getDescription());
 
+                    // Ustawiamy wszystkie potrzebne pola
                     dto.setProductId(comment.getProduct().getId());
                     dto.setProductName(comment.getProduct().getProductName());
+
+                    // Ustawiamy ścieżkę do obrazu produktu
+                    dto.setProductImage(comment.getProduct().getImage());
+
+                    // Jeśli chcesz też ustawiać username, możesz to zrobić tak:
+                    dto.setUsername(comment.getUser().getName());
 
                     return dto;
                 })
